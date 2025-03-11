@@ -63,32 +63,34 @@ kotlin {
 
 This setup generates the following Maven publications:
 
-* Target-specific publications:
+**Target-specific publications**
 
-  * `jvm`:`test:lib-jvm:1.0`
-  * `iosX64`:  `test:lib-iosx64:1.0`
-  * `iosArm64`: `test:lib-iosarm64:1.0`
+| Target     | Publication             |
+|------------|-------------------------|
+| `jvm`      | `test:lib-jvm:1.0`      | 
+| `iosX64`   | `test:lib-iosx64:1.0`   |
+| `iosArm64` | `test:lib-iosarm64:1.0` |
 
-  Each target-specific publication is independent. For example, running `publishJvmPublicationTo<MavenRepositoryName>`
-  publishes only the JVM module, leaving other modules unpublished.
+Each target-specific publication is independent. For example, running the `publishJvmPublicationTo<MavenRepositoryName>`
+task publishes only the JVM module, leaving other modules unpublished.
 
-* Root publication `kotlinMultiplatform`: `test:lib:1.0`
+**Root publication** `kotlinMultiplatform` — `test:lib:1.0`
 
-  The `kotlinMultiplatform` publication serves as an entry point that references all target-specific publications.
-  It includes metadata artifacts and ensures proper dependency resolution by including references to other publications:
-  expected URLs and coordinates for individual platform artifacts.
+The `kotlinMultiplatform` publication serves as an entry point that references all target-specific publications.
+It includes metadata artifacts and ensures proper dependency resolution by including references to other publications:
+expected URLs and coordinates for individual platform artifacts.
 
-  > Some repositories, such as Maven Central, require the root module to contain a JAR artifact without a classifier,
-  > for example `kotlinMultiplatform-1.0.jar`.
-  > The Kotlin Multiplatform plugin automatically produces the required artifact with the embedded metadata artifacts.
-  > This means you don't have to customize your build by adding an empty artifact to the root module of your library to
-  > meet the repository's requirements.
-  >
-  {style="note"}
+> Some repositories, such as Maven Central, require the root module to contain a JAR artifact without a classifier,
+> for example `kotlinMultiplatform-1.0.jar`.
+> The Kotlin Multiplatform plugin automatically produces the required artifact with the embedded metadata artifacts.
+> This means you don't have to customize your build by adding an empty artifact to the root module of your library to
+> meet the repository's requirements.
+>
+{style="note"}
 
-  The `kotlinMultiplatform` publication may also need sources and documentation artifacts if that is required by the
-  repository. In that case, use [`artifact()`](https://docs.gradle.org/current/javadoc/org/gradle/api/publish/maven/MavenPublication.html#artifact-java.lang.Object-)
-  in the publication's scope.
+The `kotlinMultiplatform` publication may also need sources and documentation artifacts if that is required by the
+repository. In that case, use [`artifact()`](https://docs.gradle.org/current/javadoc/org/gradle/api/publish/maven/MavenPublication.html#artifact-java.lang.Object-)
+in the publication's scope.
 
 ### Publishing a complete library
 
@@ -108,20 +110,24 @@ When publishing to Maven Local, you can use a special task:
 These tasks ensure that all target-specific and root publications are published together, making the library fully
 available for dependency resolution.
 
-Alternatively, you can use separate publication tasks. Run the root publication first:
+Alternatively, you can use separate publication tasks:
 
-```bash
-./gradlew publishKotlinMultiplatformPublicationToMavenLocal
-````
+1. Run the root publication first:
 
-This task publishes a `*.module` file with information about the target-specific publications, but the targets themselves
-remain unpublished. To complete the process, publish each target-specific publication separately:
+   ```bash
+   ./gradlew publishKotlinMultiplatformPublicationToMavenLocal
+   ```
 
-```bash
-./gradlew publish<TargetName>PublicationToMavenLocal
-```
+   This task publishes a `*.module` file with information about the target-specific publications, but the targets themselves
+   remain unpublished.
+  
+2. To complete the process, publish each target-specific publication separately:
 
-This guarantees that all artifacts are available and correctly referenced.
+   ```bash
+   ./gradlew publish<TargetName>PublicationToMavenLocal
+   ```
+
+   This guarantees that all artifacts are available and correctly referenced.
 
 ## Host requirements
 
