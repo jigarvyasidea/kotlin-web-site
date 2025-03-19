@@ -3,6 +3,7 @@ package builds.apiReferences
 import builds.apiReferences.kgp.KotlinGradlePluginBuildApiReference
 import builds.apiReferences.kgp.KotlinGradlePluginBuildSearchIndex
 import builds.apiReferences.kgp.KotlinGradlePluginPrepareDokkaTemplates
+import builds.apiReferences.kgp.kotlinGradlePluginReferences
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildSearchIndex
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesPrepareDokkaTemplates
@@ -62,5 +63,8 @@ object BuildApiReferencesProject : Project({
     vcsRoot(Kotlin)
     vcsRoot(KotlinKGP)
 
+    kotlinGradlePluginReferences()
+
     template(PrepareDokkaTemplate)
 })
+
