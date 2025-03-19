@@ -1,86 +1,32 @@
 package builds.apiReferences.kgp
 
-import BuildParams.KGP_ID
-import builds.apiReferences.BuildApiPages
-import builds.apiReferences.dependsOnDokkaTemplate
-import builds.apiReferences.scriptBuildHtml
-import jetbrains.buildServer.configs.kotlin.Project
-import jetbrains.buildServer.configs.kotlin.RelativeId
-import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
-import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
-
-private class ReferenceVersion(val version: String, val branch: String)
-
-private val KGP_VERSIONS = listOf(
-    ReferenceVersion(version = "latest", branch = "v2.1.0"),
-    ReferenceVersion(version = "2.1.20-RC3", branch = "v2.1.20-RC3")
-)
+import APIReference
+import ReferenceVersion
 
 private const val KGP_API_OUTPUT_DIR = "libraries/tools/gradle/documentation/build/documentation/kotlinlang"
 private const val KGP_API_TEMPLATES_DIR = "build/api-reference/templates"
 
-fun String.camelCase(delim: String = "-") = this.split(delim).joinToString("") { it.capitalize() }
+class KGPReference : APIReference {
+    override val id = "kotlin-gradle-plugin"
+    override val versions = mutableListOf<ReferenceVersion>()
+}
 
-fun Project.kotlinGradlePluginReferences() {
-    subProject {
-        id = RelativeId("KotlinGradlePluginProject")
-        name = "Kotlin Gradle Plugin"
+fun KGPReference.addVersion(
+    version: String,
+    branch: String,
+    vcsUrl: String = "https://github.com/JetBrains/kotlin.git",
+    templateDir: String = KGP_API_TEMPLATES_DIR,
+    outputDir: String = KGP_API_OUTPUT_DIR
+) {
+    this.versions.add(
+        ReferenceVersion(
+            version, branch, vcsUrl, templateDir, outputDir
+        )
+    )
+}
 
-        val apiId = KGP_ID
-
-        KGP_VERSIONS.forEach {
-            val tagOrBranch = it.branch
-            val version = it.version
-
-            val itemId = apiId.camelCase()
-            val itemTcId = "${this@subProject.id}_${itemId}_${
-                version.replace(".", "").camelCase()
-            }"
-
-            val vcs = GitVcsRoot {
-                id = RelativeId("${itemTcId}Vcs")
-                name = "$itemId $version"
-                url = "git@github.com:JetBrains/kotlin.git"
-
-                branch = "refs/${if (tagOrBranch.startsWith("v")) "tags" else "heads"}/$tagOrBranch"
-                useTagsAsBranches = true
-                branchSpec = ""
-
-                authMethod = uploadedKey {
-                    uploadedKey = "teamcity"
-                }
-            }
-
-            vcsRoot(vcs)
-
-            buildType(object : BuildApiPages(
-                apiId = "$apiId/$version",
-                releaseTag = tagOrBranch,
-                pagesRoot = KGP_API_OUTPUT_DIR,
-                vcsDefaultTrigger = { enabled = false },
-                stepDropSnapshot = { null },
-                stepBuildHtml = {
-                    val defaultStep = scriptBuildHtml()
-                    ScriptBuildStep {
-                        id = defaultStep.id
-                        name = defaultStep.name
-                        //language=bash
-                        scriptContent = """
-                              #!/bin/bash
-                              set -e -u
-                              ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
-                                -PdeployVersion="$version" --no-daemon --no-configuration-cache
-                            """.trimIndent()
-                    }
-                },
-                init = {
-                    id = RelativeId("${itemTcId}Build")
-                    name = "$version pages"
-                    vcs { root(vcs) }
-                    dependencies {
-                        dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
-                    }
-                }) {})
-        }
-    }
+fun kgpReference(init: KGPReference.() -> Unit): KGPReference {
+    val instance = KGPReference()
+    instance.init()
+    return instance
 }

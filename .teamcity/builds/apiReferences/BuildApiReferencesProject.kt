@@ -1,9 +1,8 @@
 package builds.apiReferences
 
-import builds.apiReferences.kgp.KotlinGradlePluginBuildApiReference
-import builds.apiReferences.kgp.KotlinGradlePluginBuildSearchIndex
-import builds.apiReferences.kgp.KotlinGradlePluginPrepareDokkaTemplates
-import builds.apiReferences.kgp.kotlinGradlePluginReferences
+import APIReference
+import BuildParams.KGP_API
+import builds.apiReferences.kgp.*
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildSearchIndex
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesPrepareDokkaTemplates
@@ -24,6 +23,7 @@ import builds.apiReferences.stdlib.StdlibPrepareDokkaTemplates
 import builds.apiReferences.templates.PrepareDokkaTemplate
 import builds.apiReferences.vcsRoots.*
 import jetbrains.buildServer.configs.kotlin.Project
+import kotlinApiReferences
 
 object BuildApiReferencesProject : Project({
     name = "API References"
@@ -63,7 +63,7 @@ object BuildApiReferencesProject : Project({
     vcsRoot(Kotlin)
     vcsRoot(KotlinKGP)
 
-    kotlinGradlePluginReferences()
+    kotlinApiReferences(KGP_API)
 
     template(PrepareDokkaTemplate)
 })
