@@ -41,54 +41,46 @@ fun Project.kotlinGradlePluginReferences() {
                 name = "$itemId $version"
                 url = "git@github.com:JetBrains/kotlin.git"
 
-                branch = tagOrBranch
+                branch = "refs/${if (tagOrBranch.startsWith("v")) "tags" else "heads"}/$tagOrBranch"
                 useTagsAsBranches = true
-                branchSpec = """
-                    refs/heads/*
-                    refs/tags/*
-                """.trimIndent()
+                branchSpec = ""
 
                 authMethod = uploadedKey {
                     uploadedKey = "teamcity"
                 }
             }
 
-            subProject {
-                id = RelativeId("${itemTcId}Project")
-                name = "$itemId $version"
+            vcsRoot(vcs)
 
-                vcsRoot(vcs)
-
-                buildType(object : BuildApiPages(
-                    apiId = "$apiId/$version",
-                    releaseTag = tagOrBranch,
-                    pagesRoot = KGP_API_OUTPUT_DIR,
-                    vcsDefaultTrigger = { enabled = false },
-                    stepDropSnapshot = { null },
-                    stepBuildHtml = {
-                        val defaultStep = scriptBuildHtml()
-                        ScriptBuildStep {
-                            id = defaultStep.id
-                            name = defaultStep.name
-                            //language=bash
-                            scriptContent = """
+            buildType(object : BuildApiPages(
+                apiId = "$apiId/$version",
+                releaseTag = tagOrBranch,
+                pagesRoot = KGP_API_OUTPUT_DIR,
+                vcsDefaultTrigger = { enabled = false },
+                stepDropSnapshot = { null },
+                stepBuildHtml = {
+                    val defaultStep = scriptBuildHtml()
+                    ScriptBuildStep {
+                        id = defaultStep.id
+                        name = defaultStep.name
+                        //language=bash
+                        scriptContent = """
                               #!/bin/bash
                               set -e -u
                               ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
                                 -PdeployVersion="$version" --no-daemon --no-configuration-cache
                             """.trimIndent()
-                        }
-                    },
-                    init = {
-                        name = "$itemId $version Pages"
-                        vcs { root(vcs) }
-                        dependencies {
-                            dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
-                        }
-                    }) {
-                    override var id: Id? = RelativeId("${itemTcId}Build")
-                })
-            }
+                    }
+                },
+                init = {
+                    name = "$version Pages"
+                    vcs { root(vcs) }
+                    dependencies {
+                        dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
+                    }
+                }) {
+                override var id: Id? = RelativeId("${itemTcId}Build")
+            })
         }
     }
 }
