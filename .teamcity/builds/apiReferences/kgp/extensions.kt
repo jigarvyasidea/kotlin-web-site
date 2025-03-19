@@ -4,6 +4,7 @@ import BuildParams.KGP_ID
 import builds.apiReferences.BuildApiPages
 import builds.apiReferences.dependsOnDokkaTemplate
 import builds.apiReferences.scriptBuildHtml
+import jetbrains.buildServer.configs.kotlin.Id
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
@@ -19,7 +20,7 @@ private val KGP_VERSIONS = listOf(
 private const val KGP_API_OUTPUT_DIR = "libraries/tools/gradle/documentation/build/documentation/kotlinlang"
 private const val KGP_API_TEMPLATES_DIR = "build/api-reference/templates"
 
-private class KotlinReferencePages(
+private open class KotlinReferencePages(
     apiId: String,
     version: String,
     tagOrBranch: String,
@@ -75,11 +76,13 @@ fun Project.kotlinGradlePluginReferences() {
 
         KGP_VERSIONS.forEach {
             buildType(
-                KotlinReferencePages(
+                object : KotlinReferencePages(
                     apiId = KGP_ID,
                     version = it.version,
                     tagOrBranch = it.branch,
-                )
+                ) {
+                    override var id: Id? = RelativeId("KotlinGradlePlugin${it.version}")
+                }
             )
         }
     }
