@@ -31,8 +31,11 @@ fun Project.kotlinGradlePluginReferences() {
             val tagOrBranch = it.branch
             val version = it.version
 
+            val itemId = "${apiId}_${version.replace(".", "")}"
+            val itemTcId = "${this@subProject.id}_${itemId}}"
+
             val vcs = GitVcsRoot {
-                id = RelativeId("KotlinGradlePlugin${version}VcsRoot")
+                id = RelativeId("${itemTcId}Vcs")
                 name = "$apiId ($version) VCS"
                 url = "git@github.com:JetBrains/kotlin.git"
 
@@ -77,7 +80,7 @@ fun Project.kotlinGradlePluginReferences() {
                     }
                 }
             ) {
-                override var id: Id? = RelativeId("${apiId}${version.replace(".", "")}Build")
+                override var id: Id? = RelativeId("${itemTcId}Build")
             })
         }
     }
