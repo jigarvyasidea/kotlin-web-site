@@ -70,6 +70,7 @@ private class KotlinReferencePages(
 
 fun Project.kotlinGradlePluginReferences() {
     subProject {
+        id = RelativeId("KotlinGradlePluginProject")
         name = "Kotlin Gradle Plugin"
 
         KGP_VERSIONS.forEach {
