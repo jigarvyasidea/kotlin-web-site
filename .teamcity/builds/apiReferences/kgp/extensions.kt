@@ -32,7 +32,9 @@ fun Project.kotlinGradlePluginReferences() {
             val version = it.version
 
             val itemId = apiId.split("-").joinToString("") { it.capitalize() }
-            val itemTcId = "${this@subProject.id}_${itemId}_${version.replace(".", "")}"
+            val itemTcId = "${this@subProject.id}_${itemId}_${
+                version.replace(".", "").split("-").joinToString("") { it.capitalize() }
+            }"
 
             val vcs = GitVcsRoot {
                 id = RelativeId("${itemTcId}Vcs")
