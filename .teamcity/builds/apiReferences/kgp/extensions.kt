@@ -69,7 +69,7 @@ private class KotlinReferencePages(
     })
 
 fun Project.kotlinGradlePluginReferences() {
-    subProject(Project {
+    subProject {
         name = "Kotlin Gradle Plugin"
 
         KGP_VERSIONS.forEach {
@@ -81,5 +81,5 @@ fun Project.kotlinGradlePluginReferences() {
                 )
             )
         }
-    })
+    }
 }
