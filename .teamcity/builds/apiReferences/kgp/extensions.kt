@@ -5,6 +5,7 @@ import builds.apiReferences.BuildApiPages
 import builds.apiReferences.dependsOnDokkaTemplate
 import builds.apiReferences.scriptBuildHtml
 import jetbrains.buildServer.configs.kotlin.Project
+import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
@@ -45,6 +46,7 @@ private class KotlinReferencePages(
     init = {
         vcs {
             root(GitVcsRoot {
+                id = RelativeId("KotlinGradlePlugin${version}VcsRoot")
                 name = "$apiId ($version) VCS"
                 url = "git@github.com:JetBrains/kotlin.git"
 
@@ -67,13 +69,17 @@ private class KotlinReferencePages(
     })
 
 fun Project.kotlinGradlePluginReferences() {
-    KGP_VERSIONS.forEach {
-        buildType(
-            KotlinReferencePages(
-                apiId = KGP_ID,
-                version = it.version,
-                tagOrBranch = it.branch,
+    subProject(Project {
+        name = "Kotlin Gradle Plugin"
+
+        KGP_VERSIONS.forEach {
+            buildType(
+                KotlinReferencePages(
+                    apiId = KGP_ID,
+                    version = it.version,
+                    tagOrBranch = it.branch,
+                )
             )
-        )
-    }
+        }
+    })
 }
