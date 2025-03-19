@@ -53,6 +53,7 @@ fun Project.kotlinGradlePluginReferences() {
 
             subProject {
                 id = RelativeId("${itemTcId}Project")
+                name = "$itemId $version"
 
                 vcsRoot(vcs)
 
