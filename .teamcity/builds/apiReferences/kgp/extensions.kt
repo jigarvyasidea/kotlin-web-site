@@ -44,8 +44,8 @@ fun Project.kotlinGradlePluginReferences() {
                 branch = tagOrBranch
                 useTagsAsBranches = true
                 branchSpec = """
-                    refs/heads/($tagOrBranch)
-                    refs/tags/($tagOrBranch)
+                    refs/heads/*
+                    refs/tags/*
                 """.trimIndent()
 
                 authMethod = uploadedKey {
@@ -80,6 +80,7 @@ fun Project.kotlinGradlePluginReferences() {
                         }
                     },
                     init = {
+                        name = "$itemId $version Pages"
                         vcs { root(vcs) }
                         dependencies {
                             dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
