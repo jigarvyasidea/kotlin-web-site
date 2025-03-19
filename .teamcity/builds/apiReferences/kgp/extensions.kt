@@ -48,6 +48,8 @@ fun Project.kotlinGradlePluginReferences() {
                 }
             }
 
+            vcsRoot(vcs)
+
             buildType(object : BuildApiPages(
                 apiId = "$apiId/$version",
                 releaseTag = tagOrBranch,
