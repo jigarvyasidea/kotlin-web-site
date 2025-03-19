@@ -20,33 +20,18 @@ private val KGP_VERSIONS = listOf(
 private const val KGP_API_OUTPUT_DIR = "libraries/tools/gradle/documentation/build/documentation/kotlinlang"
 private const val KGP_API_TEMPLATES_DIR = "build/api-reference/templates"
 
-private open class KotlinReferencePages(
-    apiId: String,
-    version: String,
-    tagOrBranch: String,
-) : BuildApiPages(
-    apiId = "$apiId/$version",
-    releaseTag = tagOrBranch,
-    pagesRoot = KGP_API_OUTPUT_DIR,
-    vcsDefaultTrigger = { enabled = false },
-    stepDropSnapshot = { null },
-    stepBuildHtml = {
-        val defaultStep = scriptBuildHtml()
-        ScriptBuildStep {
-            id = defaultStep.id
-            name = defaultStep.name
-            //language=bash
-            scriptContent = """
-                #!/bin/bash
-                 set -e -u
-                ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
-                    -PdeployVersion="$version" --no-daemon --no-configuration-cache
-            """.trimIndent()
-        }
-    },
-    init = {
-        vcs {
-            root(GitVcsRoot {
+fun Project.kotlinGradlePluginReferences() {
+    subProject {
+        id = RelativeId("KotlinGradlePluginProject")
+        name = "Kotlin Gradle Plugin"
+
+        val apiId = KGP_ID
+
+        KGP_VERSIONS.forEach {
+            val tagOrBranch = it.branch
+            val version = it.version
+
+            val vcs = GitVcsRoot {
                 id = RelativeId("KotlinGradlePlugin${version}VcsRoot")
                 name = "$apiId ($version) VCS"
                 url = "git@github.com:JetBrains/kotlin.git"
@@ -61,29 +46,37 @@ private open class KotlinReferencePages(
                 authMethod = uploadedKey {
                     uploadedKey = "teamcity"
                 }
-            })
-        }
+            }
 
-        dependencies {
-            dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
-        }
-    })
-
-fun Project.kotlinGradlePluginReferences() {
-    subProject {
-        id = RelativeId("KotlinGradlePluginProject")
-        name = "Kotlin Gradle Plugin"
-
-        KGP_VERSIONS.forEach {
-            buildType(
-                object : KotlinReferencePages(
-                    apiId = KGP_ID,
-                    version = it.version,
-                    tagOrBranch = it.branch,
-                ) {
-                    override var id: Id? = RelativeId("KotlinGradlePlugin${it.version}")
+            buildType(object : BuildApiPages(
+                apiId = "$apiId/$version",
+                releaseTag = tagOrBranch,
+                pagesRoot = KGP_API_OUTPUT_DIR,
+                vcsDefaultTrigger = { enabled = false },
+                stepDropSnapshot = { null },
+                stepBuildHtml = {
+                    val defaultStep = scriptBuildHtml()
+                    ScriptBuildStep {
+                        id = defaultStep.id
+                        name = defaultStep.name
+                        //language=bash
+                        scriptContent = """
+                          #!/bin/bash
+                          set -e -u
+                          ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
+                            -PdeployVersion="$version" --no-daemon --no-configuration-cache
+                        """.trimIndent()
+                    }
+                },
+                init = {
+                    vcs { root(vcs) }
+                    dependencies {
+                        dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
+                    }
                 }
-            )
+            ) {
+                override var id: Id? = RelativeId("${apiId}${version.replace(".", "")}Build")
+            })
         }
     }
 }
