@@ -31,12 +31,12 @@ fun Project.kotlinGradlePluginReferences() {
             val tagOrBranch = it.branch
             val version = it.version
 
-            val itemId = "${apiId}_${version.replace(".", "")}"
-            val itemTcId = "${this@subProject.id}_${itemId}}"
+            val itemId = apiId.split("-").joinToString("") { it.capitalize() }
+            val itemTcId = "${this@subProject.id}_${itemId}_${version.replace(".", "")}"
 
             val vcs = GitVcsRoot {
                 id = RelativeId("${itemTcId}Vcs")
-                name = "$apiId ($version) VCS"
+                name = "$itemId $version"
                 url = "git@github.com:JetBrains/kotlin.git"
 
                 branch = tagOrBranch
@@ -51,37 +51,40 @@ fun Project.kotlinGradlePluginReferences() {
                 }
             }
 
-            vcsRoot(vcs)
+            subProject {
+                id = RelativeId("${itemTcId}Project")
 
-            buildType(object : BuildApiPages(
-                apiId = "$apiId/$version",
-                releaseTag = tagOrBranch,
-                pagesRoot = KGP_API_OUTPUT_DIR,
-                vcsDefaultTrigger = { enabled = false },
-                stepDropSnapshot = { null },
-                stepBuildHtml = {
-                    val defaultStep = scriptBuildHtml()
-                    ScriptBuildStep {
-                        id = defaultStep.id
-                        name = defaultStep.name
-                        //language=bash
-                        scriptContent = """
-                          #!/bin/bash
-                          set -e -u
-                          ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
-                            -PdeployVersion="$version" --no-daemon --no-configuration-cache
-                        """.trimIndent()
-                    }
-                },
-                init = {
-                    vcs { root(vcs) }
-                    dependencies {
-                        dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
-                    }
-                }
-            ) {
-                override var id: Id? = RelativeId("${itemTcId}Build")
-            })
+                vcsRoot(vcs)
+
+                buildType(object : BuildApiPages(
+                    apiId = "$apiId/$version",
+                    releaseTag = tagOrBranch,
+                    pagesRoot = KGP_API_OUTPUT_DIR,
+                    vcsDefaultTrigger = { enabled = false },
+                    stepDropSnapshot = { null },
+                    stepBuildHtml = {
+                        val defaultStep = scriptBuildHtml()
+                        ScriptBuildStep {
+                            id = defaultStep.id
+                            name = defaultStep.name
+                            //language=bash
+                            scriptContent = """
+                              #!/bin/bash
+                              set -e -u
+                              ./gradlew :gradle:documentation:dokkaKotlinlangDocumentation \
+                                -PdeployVersion="$version" --no-daemon --no-configuration-cache
+                            """.trimIndent()
+                        }
+                    },
+                    init = {
+                        vcs { root(vcs) }
+                        dependencies {
+                            dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
+                        }
+                    }) {
+                    override var id: Id? = RelativeId("${itemTcId}Build")
+                })
+            }
         }
     }
 }
