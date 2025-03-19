@@ -4,7 +4,6 @@ import BuildParams.KGP_ID
 import builds.apiReferences.BuildApiPages
 import builds.apiReferences.dependsOnDokkaTemplate
 import builds.apiReferences.scriptBuildHtml
-import jetbrains.buildServer.configs.kotlin.Id
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.RelativeId
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
@@ -13,12 +12,14 @@ import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 private class ReferenceVersion(val version: String, val branch: String)
 
 private val KGP_VERSIONS = listOf(
-    ReferenceVersion(version = "2.1.0", branch = "v2.1.0"),
+    ReferenceVersion(version = "latest", branch = "v2.1.0"),
     ReferenceVersion(version = "2.1.20-RC3", branch = "v2.1.20-RC3")
 )
 
 private const val KGP_API_OUTPUT_DIR = "libraries/tools/gradle/documentation/build/documentation/kotlinlang"
 private const val KGP_API_TEMPLATES_DIR = "build/api-reference/templates"
+
+fun String.camelCase(delim: String = "-") = this.split(delim).joinToString("") { it.capitalize() }
 
 fun Project.kotlinGradlePluginReferences() {
     subProject {
@@ -31,9 +32,9 @@ fun Project.kotlinGradlePluginReferences() {
             val tagOrBranch = it.branch
             val version = it.version
 
-            val itemId = apiId.split("-").joinToString("") { it.capitalize() }
+            val itemId = apiId.camelCase()
             val itemTcId = "${this@subProject.id}_${itemId}_${
-                version.replace(".", "").split("-").joinToString("") { it.capitalize() }
+                version.replace(".", "").camelCase()
             }"
 
             val vcs = GitVcsRoot {
@@ -73,14 +74,13 @@ fun Project.kotlinGradlePluginReferences() {
                     }
                 },
                 init = {
-                    name = "$version Pages"
+                    id = RelativeId("${itemTcId}Build")
+                    name = "$version pages"
                     vcs { root(vcs) }
                     dependencies {
                         dependsOnDokkaTemplate(KotlinGradlePluginPrepareDokkaTemplates, KGP_API_TEMPLATES_DIR)
                     }
-                }) {
-                override var id: Id? = RelativeId("${itemTcId}Build")
-            })
+                }) {})
         }
     }
 }
