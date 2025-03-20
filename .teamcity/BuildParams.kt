@@ -18,8 +18,8 @@ object BuildParams {
     val KGP_RELEASE_TAG = if (KOTLIN_RELEASE_TAG >= "v2.1.0") KOTLIN_RELEASE_TAG else "2.1.0"
 
     val KGP_API = kgpReference {
-        addVersion("2.1.20-RC3", VCS.tag("2.1.20-RC3"))
-        addVersion("latest", VCS.tag("v2.1.0"))
+        addVersion("2.1.0", VCS.tag("v2.1.0"))
+        addVersion("2.1.20", VCS.tag("v2.1.20"))
     }
 
     const val SEARCH_APP_ID = "7961PKYRXV"
