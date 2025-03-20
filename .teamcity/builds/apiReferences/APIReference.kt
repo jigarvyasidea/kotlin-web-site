@@ -148,14 +148,12 @@ fun Project.kotlinApiReferences(
                 oldVersions.copyTo(pagesBuild.dependencies)
                 oldVersions = pagesBuild.dependencies
             } else {
-                oldVersions.dependency(pagesBuild) {
-                    snapshot {}
-                    artifacts {
-                        artifactRules = """
-                            pages.zip!** => build/documentation/kotlinlangOld/${version.version}
-                        """.trimIndent()
-                        cleanDestination = true
-                    }
+                oldVersions.artifacts(pagesBuild) {
+                    buildRule = tag("release")
+                    artifactRules = """
+                        pages.zip!** => libraries/tools/gradle/documentation/build/documentation/kotlinlangOld/${version.version}
+                    """.trimIndent()
+                    cleanDestination = true
                 }
             }
         }
