@@ -1,8 +1,9 @@
 package builds.apiReferences
 
-import APIReference
 import BuildParams.KGP_API
-import builds.apiReferences.kgp.*
+import builds.apiReferences.kgp.KotlinGradlePluginBuildApiReference
+import builds.apiReferences.kgp.KotlinGradlePluginBuildSearchIndex
+import builds.apiReferences.kgp.KotlinGradlePluginPrepareDokkaTemplates
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildApiReference
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesBuildSearchIndex
 import builds.apiReferences.kotlinx.coroutines.KotlinxCoroutinesPrepareDokkaTemplates
@@ -67,4 +68,3 @@ object BuildApiReferencesProject : Project({
 
     template(PrepareDokkaTemplate)
 })
-

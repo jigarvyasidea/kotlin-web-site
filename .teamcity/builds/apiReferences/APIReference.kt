@@ -3,10 +3,7 @@ import builds.apiReferences.BuildApiPages
 import builds.apiReferences.dependsOnDokkaTemplate
 import builds.apiReferences.scriptBuildHtml
 import builds.apiReferences.templates.PrepareDokkaTemplate
-import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.Project
-import jetbrains.buildServer.configs.kotlin.RelativeId
-import jetbrains.buildServer.configs.kotlin.VcsRoot
+import jetbrains.buildServer.configs.kotlin.*
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
@@ -91,7 +88,7 @@ fun buildPagesBuild(
 
 
 fun buildIndexBuild(
-    projectName: String, projectPrefix: String, api: APIReference, version: ReferenceVersion, pagesBuild: BuildType
+    projectName: String, projectPrefix: String, api: APIReference, pagesBuild: BuildType
 ): TemplateSearchIndex = TemplateSearchIndex {
     id = RelativeId("${projectPrefix}Search")
     name = "$projectName search"
@@ -119,7 +116,7 @@ fun Project.kotlinApiReferences(
     buildVcs: (String, String, ReferenceVersion) -> VcsRoot = ::buildVcsRoot,
     buildTemplate: (String, String, ReferenceVersion, String) -> BuildType = ::buildTemplateBuild,
     buildPages: (String, APIReference, VcsRoot, BuildType, ReferenceVersion) -> BuildType = ::buildPagesBuild,
-    buildIndex: (String, String, APIReference, ReferenceVersion, BuildType) -> BuildType = ::buildIndexBuild
+    buildIndex: (String, String, APIReference, BuildType) -> BuildType = ::buildIndexBuild
 ) {
     val projectId = api.id.camelCase()
     val projectRelativeId = RelativeId(projectId)
@@ -130,6 +127,7 @@ fun Project.kotlinApiReferences(
         name = projectName
 
         val latestVersion = api.versions.lastOrNull() ?: error("No versions found for ${api.id}")
+        var oldVersions = Dependencies()
 
         for (version in api.versions) {
             val projectPrefix = "${this@subProject.id}_${projectId}_${
@@ -145,9 +143,20 @@ fun Project.kotlinApiReferences(
             buildType(pagesBuild)
 
             if (latestVersion == version) {
-                buildType(
-                    buildIndex(projectName, projectRelativeId.value, api, version, pagesBuild)
-                )
+                buildType(buildIndex(projectName, projectRelativeId.value, api, pagesBuild))
+
+                oldVersions.copyTo(pagesBuild.dependencies)
+                oldVersions = pagesBuild.dependencies
+            } else {
+                oldVersions.dependency(pagesBuild) {
+                    snapshot {}
+                    artifacts {
+                        artifactRules = """
+                            pages.zip!** => build/documentation/kotlinlangOld/${version.version}
+                        """.trimIndent()
+                        cleanDestination = true
+                    }
+                }
             }
         }
     }
