@@ -15,7 +15,7 @@ import vcsRoots.KotlinLangOrg
 const val DEFAULT_DOKKA_PATH = "build/dokka/htmlMultiModule"
 private const val DOKKA_SPACE_REPO = "https://maven.pkg.jetbrains.space/kotlin/p/dokka/dev/"
 
-abstract class BuildApiPages(
+open class BuildApiPages(
     apiId: String,
     releaseTag: String,
     pagesRoot: String = DEFAULT_DOKKA_PATH,
