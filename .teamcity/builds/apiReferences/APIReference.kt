@@ -94,7 +94,7 @@ fun buildIndexBuild(
     projectName: String, projectPrefix: String, api: APIReference, version: ReferenceVersion, pagesBuild: BuildType
 ): TemplateSearchIndex = TemplateSearchIndex {
     id = RelativeId("${projectPrefix}Search")
-    name = "${version.version} search"
+    name = "$projectName search"
     description = "Build search index for $projectName"
 
     params {
@@ -122,10 +122,11 @@ fun Project.kotlinApiReferences(
     buildIndex: (String, String, APIReference, ReferenceVersion, BuildType) -> BuildType = ::buildIndexBuild
 ) {
     val projectId = api.id.camelCase()
+    val projectRelativeId = RelativeId(projectId)
     val projectName = api.id.camelCase(join = " ")
 
     subProject {
-        id = RelativeId(projectId)
+        id = projectRelativeId
         name = projectName
 
         val latestVersion = api.versions.lastOrNull() ?: error("No versions found for ${api.id}")
@@ -145,7 +146,7 @@ fun Project.kotlinApiReferences(
 
             if (latestVersion == version) {
                 buildType(
-                    buildIndex(projectName, projectPrefix, api, version, pagesBuild)
+                    buildIndex(projectName, projectRelativeId.value, api, version, pagesBuild)
                 )
             }
         }
