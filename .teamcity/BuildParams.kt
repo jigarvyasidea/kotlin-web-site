@@ -1,4 +1,5 @@
-import builds.apiReferences.kgp.kgpReference
+import builds.apiReferences.VCS
+import builds.apiReferences.kgp.KGPReference
 
 object BuildParams {
     const val DOKKA_TEMPLATES_VERSION = "1.9.10"
@@ -17,9 +18,9 @@ object BuildParams {
     const val KGP_ID = "kotlin-gradle-plugin"
     val KGP_RELEASE_TAG = if (KOTLIN_RELEASE_TAG >= "v2.1.0") KOTLIN_RELEASE_TAG else "2.1.0"
 
-    val KGP_API = kgpReference {
-        addVersion("2.1.0", VCS.tag("v2.1.0"))
-        addVersion("2.1.20", VCS.tag("v2.1.20"))
+    val KGP_REFERENCE = KGPReference {
+        addReference("2.1.0", VCS.tag("v2.1.0"))
+        addReference("2.1.20", VCS.tag("v2.1.20"))
     }
 
     const val SEARCH_APP_ID = "7961PKYRXV"
@@ -31,7 +32,7 @@ object BuildParams {
         "api/$KOTLINX_SERIALIZATION_ID",
         "api/$KOTLINX_DATETIME_ID",
         "api/$KOTLINX_IO_ID",
-        "api/${KGP_API.id}",
+        "api/${KGP_REFERENCE.urlPart}",
         "api/$KOTLINX_METADATA_ID",
     )
 }

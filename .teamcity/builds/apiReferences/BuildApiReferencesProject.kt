@@ -1,6 +1,6 @@
 package builds.apiReferences
 
-import BuildParams.KGP_API
+import BuildParams.KGP_REFERENCE
 import builds.apiReferences.kgp.KotlinGradlePluginBuildApiReference
 import builds.apiReferences.kgp.KotlinGradlePluginBuildSearchIndex
 import builds.apiReferences.kgp.KotlinGradlePluginPrepareDokkaTemplates
@@ -24,7 +24,6 @@ import builds.apiReferences.stdlib.StdlibPrepareDokkaTemplates
 import builds.apiReferences.templates.PrepareDokkaTemplate
 import builds.apiReferences.vcsRoots.*
 import jetbrains.buildServer.configs.kotlin.Project
-import kotlinApiReferences
 
 object BuildApiReferencesProject : Project({
     name = "API References"
@@ -64,7 +63,7 @@ object BuildApiReferencesProject : Project({
     vcsRoot(Kotlin)
     vcsRoot(KotlinKGP)
 
-    kotlinApiReferences(KGP_API)
+    subProject(KGP_REFERENCE.project)
 
     template(PrepareDokkaTemplate)
 })
