@@ -10,6 +10,7 @@ private const val TEMPLATES_DIR = "build/api-reference/templates"
 class KGPReference(init: KGPReference.() -> Unit) : ReferenceProject("kotlin-gradle-plugin") {
     init {
         init()
+        build()
     }
 
     fun addReference(version: String, tagsOrBranch: String) {
@@ -19,6 +20,7 @@ class KGPReference(init: KGPReference.() -> Unit) : ReferenceProject("kotlin-gra
 
             makeReferencePages(version, OUTPUT_DIR, vcs, template) {
                 script {
+                    name = "Build API reference pages"
                     //language=bash
                     scriptContent = """
                         #!/bin/bash

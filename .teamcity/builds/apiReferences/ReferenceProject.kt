@@ -11,6 +11,10 @@ private fun String.camelCase(delim: String = "-", join: String = "") =
 typealias ProjectReferenceAttachBuild = (project: Project, version: String) -> BuildType
 
 open class ReferenceProject(val urlPart: String) {
+    init {
+        if (urlPart.isBlank()) throw IllegalArgumentException("urlPart cannot be blank")
+    }
+
     val projectName = urlPart.camelCase(join = " ")
 
     val project = Project {
