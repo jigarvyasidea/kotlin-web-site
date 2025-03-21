@@ -1,5 +1,6 @@
 package builds.apiReferences
 
+import builds.SCRIPT_PATH
 import jetbrains.buildServer.configs.kotlin.BuildType
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.RelativeId
@@ -50,7 +51,7 @@ open class ReferenceProject(val urlPart: String) {
                 artifactRules = "$workingDir/** => pages.zip"
 
                 vcs {
-                    root(KotlinLangOrg)
+                    root(KotlinLangOrg, "$SCRIPT_PATH/")
                 }
 
                 steps {
@@ -93,9 +94,7 @@ open class ReferenceProject(val urlPart: String) {
                     if (previousVersion == currentVersion) continue
                     artifacts(previousVersion) {
                         buildRule = tag("release")
-                        artifactRules = """
-                            pages.zip!** => %OLD_VERSIONS_DIR%/$version/
-                        """.trimIndent()
+                        artifactRules = "pages.zip!** => %OLD_VERSIONS_DIR%/$version/"
                         cleanDestination = true
                     }
                 }
