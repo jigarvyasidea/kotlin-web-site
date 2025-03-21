@@ -1,5 +1,5 @@
 import builds.apiReferences.VCS
-import builds.apiReferences.kgp.KGPReference
+import builds.apiReferences.kgp.KotlinGradleAPI
 
 object BuildParams {
     const val DOKKA_TEMPLATES_VERSION = "1.9.10"
@@ -18,7 +18,7 @@ object BuildParams {
     const val KGP_ID = "kotlin-gradle-plugin"
     val KGP_RELEASE_TAG = if (KOTLIN_RELEASE_TAG >= "v2.1.0") KOTLIN_RELEASE_TAG else "2.1.0"
 
-    val KGP_REFERENCE = KGPReference {
+    val KGP_REFERENCE = KotlinGradleAPI {
         addReference("2.1.0", VCS.tag("v2.1.0"))
         addReference("2.1.20", VCS.tag("v2.1.20"))
     }

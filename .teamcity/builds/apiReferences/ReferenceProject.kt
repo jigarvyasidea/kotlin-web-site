@@ -21,24 +21,28 @@ open class ReferenceProject(val urlPart: String) {
         id = RelativeId(urlPart.camelCase())
         name = projectName
         description = "Project for https://kotlinlang.org/api/$urlPart/"
+
+        params {
+            param("env.ALGOLIA_INDEX_NAME", urlPart)
+        }
     }
 
-    protected val versions = mutableListOf<Pair<String, BuildType>>()
+    protected val versions = mutableListOf<Pair<BuildType, String>>()
 
-    fun getCurrentVersion(): BuildType? = this.versions.lastOrNull()?.second
+    fun getCurrentVersion(): Pair<BuildType, String>? = this.versions.lastOrNull()
 
     fun addReference(version: String, buildReference: ProjectReferenceAttachBuild) {
-        versions.add(version to buildReference(this.project, version))
+        versions.add(buildReference(this.project, version) to version)
     }
 
     fun build() {
-        val currentVersion = getCurrentVersion()
-        if (currentVersion == null) throw IllegalStateException("Current version is not set for $projectName")
+        val (currentVersion) = getCurrentVersion()
+            ?: throw IllegalStateException("Current version is not set for $projectName")
 
         project.apply {
             buildType {
                 id = RelativeId("Latest")
-                name = "$projectName Latest"
+                name = "API Pages"
                 description = "The latest stable version for $projectName"
 
                 type = Type.COMPOSITE
@@ -52,12 +56,8 @@ open class ReferenceProject(val urlPart: String) {
 
             buildType {
                 id = RelativeId("Search")
-                name = "$projectName search"
+                name = "API Search Index"
                 description = "Build search index for $projectName"
-
-                params {
-                    param("env.ALGOLIA_INDEX_NAME", urlPart)
-                }
 
                 dependencies {
                     dependency(currentVersion) {
@@ -68,6 +68,21 @@ open class ReferenceProject(val urlPart: String) {
                             """.trimIndent()
                             cleanDestination = true
                         }
+                    }
+                }
+            }
+        }
+
+        currentVersion.apply {
+            dependencies {
+                for ((previousVersion, version) in versions) {
+                    if (previousVersion == currentVersion) continue
+                    artifacts(previousVersion) {
+                        buildRule = tag("release")
+                        artifactRules = """
+                            pages.zip!** => %OLD_VERSIONS_DIR%/$version/
+                        """.trimIndent()
+                        cleanDestination = true
                     }
                 }
             }
