@@ -10,6 +10,9 @@ private const val PREVIOUS_DIR = "libraries/tools/gradle/documentation/build/doc
 
 class KotlinGradleAPI(init: KotlinGradleAPI.() -> Unit) : ReferenceProject("kotlin-gradle-plugin") {
     init {
+        project.params {
+            param("PAGES_DIR", OUTPUT_DIR)
+        }
         init()
         build()
     }
@@ -18,7 +21,7 @@ class KotlinGradleAPI(init: KotlinGradleAPI.() -> Unit) : ReferenceProject("kotl
         addReference(version) { project, version ->
             val vcs = makeReferenceVcs(version, REPO, tagsOrBranch)
             val template = TemplateDep(TEMPLATES_DIR, makeReferenceTemplate(version, urlPart))
-            val pages = makeReferencePages(version, OUTPUT_DIR, vcs, template) {
+            val pages = makeReferencePages(version, vcs, template) {
                 script {
                     name = "Build API reference pages"
                     //language=bash

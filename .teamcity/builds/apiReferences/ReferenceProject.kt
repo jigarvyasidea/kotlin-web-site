@@ -1,9 +1,9 @@
 package builds.apiReferences
 
 import jetbrains.buildServer.configs.kotlin.BuildType
-import jetbrains.buildServer.configs.kotlin.BuildTypeSettings.Type
 import jetbrains.buildServer.configs.kotlin.Project
 import jetbrains.buildServer.configs.kotlin.RelativeId
+import vcsRoots.KotlinLangOrg
 
 private fun String.camelCase(delim: String = "-", join: String = "") =
     this.split(delim).joinToString(join) { it.capitalize() }
@@ -23,6 +23,7 @@ open class ReferenceProject(val urlPart: String) {
         description = "Project for https://kotlinlang.org/api/$urlPart/"
 
         params {
+            param("PAGES_DIR", DEFAULT_DOKKA_PATH)
             param("env.ALGOLIA_INDEX_NAME", urlPart)
         }
     }
@@ -45,7 +46,14 @@ open class ReferenceProject(val urlPart: String) {
                 name = "API Pages"
                 description = "The latest stable version for $projectName"
 
-                type = Type.COMPOSITE
+                vcs {
+                    root(KotlinLangOrg)
+                }
+
+                steps {
+                    step(scriptNoRobots("%PAGES_DIR%"))
+                    step(scriptGenerateSitemap("%PAGES_DIR%"))
+                }
 
                 dependencies {
                     dependency(currentVersion) {

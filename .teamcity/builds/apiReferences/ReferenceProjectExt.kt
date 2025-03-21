@@ -47,7 +47,6 @@ class TemplateDep(val dir: String, val build: BuildType)
 
 fun ReferenceProject.makeReferencePages(
     version: String,
-    outputDir: String = DEFAULT_DOKKA_PATH,
     vcsRoot: VcsRoot? = null,
     template: TemplateDep? = null,
     steps: BuildSteps.() -> Unit = {}
@@ -74,8 +73,6 @@ fun ReferenceProject.makeReferencePages(
 
     steps {
         steps()
-        step(scriptNoRobots(outputDir))
-        step(scriptGenerateSitemap(outputDir))
     }
 
 }.also { this.project.buildType(it) }
