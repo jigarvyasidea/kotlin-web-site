@@ -23,7 +23,6 @@ open class ReferenceProject(val urlPart: String) {
         description = "Project for https://kotlinlang.org/api/$urlPart/"
 
         params {
-            param("PAGES_DIR", DEFAULT_DOKKA_PATH)
             param("env.ALGOLIA_INDEX_NAME", urlPart)
         }
     }
@@ -40,29 +39,38 @@ open class ReferenceProject(val urlPart: String) {
         val (currentVersion) = getCurrentVersion()
             ?: throw IllegalStateException("Current version is not set for $projectName")
 
+        val workingDir = "dist/api/$urlPart"
+
         project.apply {
             buildType {
                 id = RelativeId("Latest")
                 name = "API Pages"
                 description = "The latest stable version for $projectName"
 
+                artifactRules = "$workingDir => pages.zip"
+
                 vcs {
                     root(KotlinLangOrg)
                 }
 
                 steps {
-                    step(scriptNoRobots("%PAGES_DIR%"))
-                    step(scriptGenerateSitemap("%PAGES_DIR%"))
+                    step(scriptNoRobots("dist"))
+                    step(scriptGenerateSitemap("dist"))
                 }
 
                 dependencies {
                     dependency(currentVersion) {
                         snapshot {}
+                        artifacts {
+                            artifactRules = "pages.zip!** => $workingDir"
+                            cleanDestination = true
+                        }
                     }
                 }
             }
 
             buildType {
+
                 id = RelativeId("Search")
                 name = "API Search Index"
                 description = "Build search index for $projectName"
@@ -71,9 +79,7 @@ open class ReferenceProject(val urlPart: String) {
                     dependency(currentVersion) {
                         snapshot {}
                         artifacts {
-                            artifactRules = """
-                                pages.zip!** => dist/api/${urlPart}
-                            """.trimIndent()
+                            artifactRules = "pages.zip!** => $workingDir"
                             cleanDestination = true
                         }
                     }

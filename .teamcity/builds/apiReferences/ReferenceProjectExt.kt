@@ -47,6 +47,7 @@ class TemplateDep(val dir: String, val build: BuildType)
 
 fun ReferenceProject.makeReferencePages(
     version: String,
+    outputDir: String,
     vcsRoot: VcsRoot? = null,
     template: TemplateDep? = null,
     steps: BuildSteps.() -> Unit = {}
@@ -58,6 +59,8 @@ fun ReferenceProject.makeReferencePages(
     requirements {
         doesNotContain("docker.server.osType", "windows")
     }
+
+    artifactRules = "$outputDir/** => pages.zip"
 
     if (vcsRoot != null) {
         vcs {
