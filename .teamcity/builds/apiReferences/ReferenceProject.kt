@@ -47,15 +47,15 @@ open class ReferenceProject(val urlPart: String) {
                 name = "API Pages"
                 description = "The latest stable version for $projectName"
 
-                artifactRules = "$workingDir => pages.zip"
+                artifactRules = "$workingDir/** => pages.zip"
 
                 vcs {
                     root(KotlinLangOrg)
                 }
 
                 steps {
-                    step(scriptNoRobots("dist"))
-                    step(scriptGenerateSitemap("dist"))
+                    step(scriptNoRobots(workingDir))
+                    step(scriptGenerateSitemap(workingDir))
                 }
 
                 dependencies {

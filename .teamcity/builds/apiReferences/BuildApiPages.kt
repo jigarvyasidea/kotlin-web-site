@@ -141,8 +141,8 @@ fun scriptNoRobots(pagesRoot: String, block: ScriptBuildStep.() -> Unit = {}) = 
     //language=sh
     scriptContent = """
         # replace with print
-        # find . -type f \( -regex "^./\d\+\.\d\+\(\.\d\)\?/.\+\.html${'$'}" \) -exec echo {} \; -exec sed -i -E 's/(<head[^>]*>)/\1<meta name="robots" content="noindex, nofollow">/g' {} \;
-        find . -type f \( -regex "^./\d\+\.\d\+\(\.\d\)\?/.\+\.html${'$'}" \) -exec sed -i -E 's/(<head[^>]*>)/\1<meta name="robots" content="noindex, nofollow">/g' {} \;
+        # find . -type f \( -regex "^./(older/)?\d\+\.\d\+\(\.\d\)\?/.\+\.html${'$'}" \) -exec echo {} \; -exec sed -i -E 's/(<head[^>]*>)/\1<meta name="robots" content="noindex, nofollow">/g' {} \;
+        find . -type f \( -regex "^./(older/)?\d\+\.\d\+\(\.\d\)\?/.\+\.html${'$'}" \) -exec sed -i -E 's/(<head[^>]*>)/\1<meta name="robots" content="noindex, nofollow">/g' {} \;
     """.trimIndent()
     dockerImage = "alpine"
 }.apply(block)
