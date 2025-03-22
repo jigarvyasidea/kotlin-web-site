@@ -24,7 +24,7 @@ fun scriptDistAnalyze(block: ScriptBuildStep.() -> Unit) = ScriptBuildStep {
     dockerPull = true
 }.apply(block)
 
-open class TemplateSearchIndex(init: BuildType.() -> Unit) : BuildType({
+class TemplateSearchIndex(init: BuildType.() -> Unit) : BuildType({
     artifactRules = """
         reports/** => reports.zip
     """.trimIndent()
