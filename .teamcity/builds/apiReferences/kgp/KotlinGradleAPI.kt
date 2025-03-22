@@ -14,7 +14,7 @@ class KotlinGradleAPI(init: KotlinGradleAPI.() -> Unit) : ReferenceProject("kotl
         build()
     }
 
-    fun addReference(version: String, tagsOrBranch: String) {
+    fun addVersion(version: String, tagsOrBranch: String) {
         addReference(version) { project, version ->
             val vcs = makeReferenceVcs(version, REPO, tagsOrBranch)
             val template = TemplateDep(TEMPLATES_DIR, makeReferenceTemplate(version, urlPart))

@@ -98,10 +98,11 @@ fun scriptDropSnapshot(init: ScriptBuildStep.() -> Unit = {}): BuildStep = Scrip
     """.trimIndent()
 }.apply(init)
 
-fun scriptBuildHtml(init: GradleBuildStep.() -> Unit = {}): BuildStep = GradleBuildStep {
+fun scriptBuildHtml(version: String? = null, init: GradleBuildStep.() -> Unit = {}): BuildStep = GradleBuildStep {
     id = "step-build-dokka-html-id"
     name = "Build dokka html"
     tasks = "dokkaHtmlMultiModule"
+    gradleParams = "${if (version != null) "-PdeployVersion=\"$version\" " else ""}--no-daemon --no-configuration-cache"
     useGradleWrapper = true
 }.apply(init)
 

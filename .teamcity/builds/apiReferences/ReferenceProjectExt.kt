@@ -47,10 +47,10 @@ class TemplateDep(val dir: String, val build: BuildType)
 
 fun ReferenceProject.makeReferencePages(
     version: String,
-    outputDir: String,
+    outputDir: String = DEFAULT_DOKKA_PATH,
     vcsRoot: VcsRoot? = null,
     template: TemplateDep? = null,
-    steps: BuildSteps.() -> Unit = {}
+    steps: BuildSteps.() -> Unit = { step(scriptBuildHtml(version)) }
 ) = BuildType {
     id = RelativeId("${version.replace(".", "")}_Build")
     name = "$version pages"
