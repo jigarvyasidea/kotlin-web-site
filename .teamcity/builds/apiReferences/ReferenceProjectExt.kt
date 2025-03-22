@@ -13,7 +13,7 @@ object VCS {
 }
 
 fun ReferenceProject.makeReferenceVcs(version: String, vcsUrl: String, tagOrBranch: String) = GitVcsRoot {
-    id = RelativeId("${version.replace(".", "")}_Vcs")
+    id = RelativeId("${project.id}_${version.replace(".", "")}_Vcs")
     name = version
 
     url = vcsUrl
@@ -30,7 +30,7 @@ fun ReferenceProject.makeReferenceVcs(version: String, vcsUrl: String, tagOrBran
 }
 
 fun ReferenceProject.makeReferenceTemplate(version: String, algoliaIndex: String) = BuildType {
-    id = RelativeId("${version.replace(".", "")}_Template")
+    id = RelativeId("${project.id}_${version.replace(".", "")}_Template")
     name = "$version templates"
     description = "Build Dokka Templates for $projectName"
 
@@ -52,7 +52,7 @@ fun ReferenceProject.makeReferencePages(
     template: TemplateDep? = null,
     steps: BuildSteps.() -> Unit = { step(scriptBuildHtml(version)) }
 ) = BuildType {
-    id = RelativeId("${version.replace(".", "")}_Build")
+    id = RelativeId("${project.id}_${version.replace(".", "")}_Build")
     name = "$version pages"
     description = "Build pages for $projectName"
 

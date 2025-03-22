@@ -43,7 +43,7 @@ open class ReferenceProject(val urlPart: String) {
         val workingDir = "dist/api/$urlPart"
 
         val pages = BuildType {
-            id = RelativeId("Latest")
+            id = RelativeId("${project.id}_Latest")
             name = "API Pages"
             description = "The latest stable version for $projectName"
 
@@ -72,7 +72,7 @@ open class ReferenceProject(val urlPart: String) {
         project.apply {
             buildType(pages)
             buildType {
-                id = RelativeId("Search")
+                id = RelativeId("${project.id}_Search")
                 name = "API Search Index"
                 description = "Build search index for $projectName"
 
