@@ -31,11 +31,11 @@ class KotlinGradleAPI(init: KotlinGradleAPI.() -> Unit) : ReferenceProject("kotl
                 }
             }
 
-            pages.params {
-                param("OLD_VERSIONS_DIR", PREVIOUS_DIR)
+            pages.apply {
+                params {
+                    param("OLD_VERSIONS_DIR", PREVIOUS_DIR)
+                }
             }
-
-            pages
         }
     }
 }

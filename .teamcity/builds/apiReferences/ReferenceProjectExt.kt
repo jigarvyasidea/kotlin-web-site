@@ -77,5 +77,4 @@ fun ReferenceProject.makeReferencePages(
     steps {
         steps()
     }
-
 }.also { this.project.buildType(it) }

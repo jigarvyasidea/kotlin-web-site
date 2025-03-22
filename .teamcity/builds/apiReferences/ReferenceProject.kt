@@ -42,42 +42,42 @@ open class ReferenceProject(val urlPart: String) {
 
         val workingDir = "dist/api/$urlPart"
 
-        project.apply {
-            buildType {
-                id = RelativeId("Latest")
-                name = "API Pages"
-                description = "The latest stable version for $projectName"
+        val pages = BuildType {
+            id = RelativeId("Latest")
+            name = "API Pages"
+            description = "The latest stable version for $projectName"
 
-                artifactRules = "$workingDir/** => pages.zip"
+            artifactRules = "$workingDir/** => pages.zip"
 
-                vcs {
-                    root(KotlinLangOrg, "$SCRIPT_PATH/")
-                }
+            vcs {
+                root(KotlinLangOrg, "$SCRIPT_PATH/")
+            }
 
-                steps {
-                    step(scriptNoRobots(workingDir))
-                    step(scriptGenerateSitemap(workingDir))
-                }
+            steps {
+                step(scriptNoRobots(workingDir))
+                step(scriptGenerateSitemap(workingDir))
+            }
 
-                dependencies {
-                    dependency(currentVersion) {
-                        snapshot {}
-                        artifacts {
-                            artifactRules = "pages.zip!** => $workingDir"
-                            cleanDestination = true
-                        }
+            dependencies {
+                dependency(currentVersion) {
+                    snapshot {}
+                    artifacts {
+                        artifactRules = "pages.zip!** => $workingDir"
+                        cleanDestination = true
                     }
                 }
             }
+        }
 
+        project.apply {
+            buildType(pages)
             buildType {
-
                 id = RelativeId("Search")
                 name = "API Search Index"
                 description = "Build search index for $projectName"
 
                 dependencies {
-                    dependency(currentVersion) {
+                    dependency(pages) {
                         snapshot {}
                         artifacts {
                             artifactRules = "pages.zip!** => $workingDir"
