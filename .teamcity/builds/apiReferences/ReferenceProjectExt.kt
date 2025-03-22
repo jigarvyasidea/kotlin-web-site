@@ -60,7 +60,10 @@ fun ReferenceProject.makeReferencePages(
         doesNotContain("docker.server.osType", "windows")
     }
 
-    artifactRules = "$outputDir/** => pages.zip"
+    artifactRules = """
+        $outputDir/** => pages.zip
+        -:$outputDir/not-found-version.html
+    """.trimIndent()
 
     if (vcsRoot != null) {
         vcs {
